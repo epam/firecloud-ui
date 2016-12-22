@@ -60,17 +60,22 @@
                  {:header "# of Participants" :starting-width 100}]
        :pagination (react/call :pagination this)
        :->row (juxt identity :library:indication :library:dataUseRestriction :library:numSubjects)}])
-   ;:component-will-receive-props
+   :component-will-receive-props
    ;(utils/log "next-props in component will receive props")
    ;(utils/cljslog (:facet-filters next-props))
    ;(let [current-search-text (:filter-text (react/call :get-query-params (@refs "table")))
    ;     new-search-text (:search-text next-props)]
    ; (when-not (= current-search-text new-search-text)
    ;   (react/call :update-query-params (@refs "table") {:filter-text new-search-text})))
-   :execute-search
-   (fn [{:keys [props refs]}]
-     (utils/cljslog (:search-text props))
-     (react/call :execute-search (@refs "table")))
+   ;:execute-search
+   (fn [{:keys [props refs after-update next-props]}]
+     ;(utils/cljslog "filters" (= (:facet-filters props) (:facet-filters next-props)))
+     ;(utils/cljslog "search str" (= (:search-text props) (:search-text next-props)))
+     (when-not (and (apply = (map :facet-filters [props next-props]))
+                    (= (:search-text props) (:search-text next-props)))
+       ;(utils/cljslog "comp-will-receive" props next-props)
+       (after-update (fn []
+                       (react/call :execute-search (@refs "table"))))))
    :check-access
    (fn [{:keys [props]} data]
      (endpoints/call-ajax-orch
@@ -80,20 +85,21 @@
                      (nav/navigate (:nav-context props) "workspaces" (common/row->workspace-id data))
                      (comps/push-message {:header "Request Access"
                                           :message
-                                            (if (= (config/tcga-namespace) (:namespace data))
-                                             [:span {}
-                                               [:p {} "For access to TCGA protected data please apply for access via dbGaP [instructions can be found "
-                                               [:a {:href "https://wiki.nci.nih.gov/display/TCGA/Application+Process" :target "_blank"} "here"] "]." ]
-                                               [:p {} "After dbGaP approves your application please link your eRA Commons ID in your FireCloud profile page."]]
-                                             [:span {}
+                                          (if (= (config/tcga-namespace) (:namespace data))
+                                            [:span {}
+                                             [:p {} "For access to TCGA protected data please apply for access via dbGaP [instructions can be found "
+                                              [:a {:href "https://wiki.nci.nih.gov/display/TCGA/Application+Process" :target "_blank"} "here"] "]."]
+                                             [:p {} "After dbGaP approves your application please link your eRA Commons ID in your FireCloud profile page."]]
+                                            [:span {}
                                              "Please contact " [:a {:target "_blank" :href (str "mailto:" (:library:contactEmail data))} (str (:library:datasetCustodian data) " <" (:library:contactEmail data) ">")]
-                                               " and request access for the "
-                                               (:namespace data) "/" (:name data) " workspace."])})))}))
+                                             " and request access for the "
+                                             (:namespace data) "/" (:name data) " workspace."])})))}))
    :pagination
    (fn [{:keys [this state props]}]
      ;(utils/cljslog (:facet-filters props))
      ;(utils/cljslog "pagination search text first line "(:search-text props))
      (fn [{:keys [current-page rows-per-page]} callback]
+       (utils/cljslog "inside pagination" (:aggregate-fields props))
        (endpoints/call-ajax-orch
          (let [from (* (- current-page 1) rows-per-page)]
            {:endpoint endpoints/search-datasets
@@ -103,7 +109,7 @@
                                              (:facet-filters props))
                       :from from
                       :size rows-per-page
-                      :fieldAggregations (map (fn [{:keys [name]}] (name name)) (:aggregates props))}
+                      :fieldAggregations (map (fn [{:keys [name]}] (name name)) (:aggregate-fields props))}
             :headers utils/content-type=json
             :on-done
             (fn [{:keys [success? get-parsed-response status-text]}]
@@ -113,8 +119,8 @@
                   (callback {:group-count total
                              :filtered-count total
                              :rows results})
-                  ;(react/call :update-aggregates this aggregations)
-                   )
+                  ((:aggregate-callback props) aggregations)
+                  )
                 (callback {:error status-text})))})))
      )})
 
@@ -242,18 +248,20 @@
                                            :callback-function (:callback-function props)}]
               ;(= render-hint "slider") [FacetSlider {:title title :term k :results (:results @state)}]
             ))]))
-   :component-did-mount
-   (fn [{:keys [props state]}]
-     (let [k (first (keys (:aggregate-field props)))]
-       (endpoints/call-ajax-orch
-         {:endpoint endpoints/search-datasets
-          :payload {"fieldAggregations" [k]}
-          :headers utils/content-type=json
-          :on-done
-          (fn [{:keys [success? get-parsed-response status-text]}]
-            (if success?
-              (let [{:keys [results aggregations]} (get-parsed-response)]
-                (swap! state assoc :results results :aggregations aggregations))))})))})
+   ;:component-did-mount
+   ;(fn [{:keys [props state]}]
+   ;  ;(js* "debugger")
+   ;  (let [k (first (keys (:aggregate-field props)))]
+   ;    (endpoints/call-ajax-orch
+   ;      {:endpoint endpoints/search-datasets
+   ;       :payload {"fieldAggregations" [k]}
+   ;       :headers utils/content-type=json
+   ;       :on-done
+   ;       (fn [{:keys [success? get-parsed-response status-text]}]
+   ;         (if success?
+   ;           (let [{:keys [results aggregations]} (get-parsed-response)]
+   ;             (swap! state assoc :results results :aggregations aggregations))))})))
+   })
 
 
 (react/defc FacetSection
@@ -265,7 +273,7 @@
           (fn [m] [Facet {:aggregate-field m
                           :selected-items (get-in props [:facet-filters (first (keys m))])
                           :callback-function (:callback-function props)}]) ;;
-          aggregate-fields)]))})
+          (utils/cljslog aggregate-fields))]))})
 
 
 (def ^:private PERSISTENCE-KEY "library-page")
@@ -275,6 +283,10 @@
   {:update-filter
    (fn [{:keys [state]} facet-name facet-list]
      (swap! state assoc-in [:facet-filters facet-name] facet-list))
+     ;(after-update (fn [] (react/call :execute-search ( @refs "dataset-table")))))
+   :update-aggregates
+   (fn [{:keys [state]} aggregations]
+     (swap! state assoc :aggregate-fields aggregations))
    :get-initial-state
    (fn []
      (persistence/try-restore
@@ -282,30 +294,66 @@
         :initial (fn []
                    {:v VERSION
                     :search-text ""
-                    :facet-filters {}})
+                    :facet-filters {}
+                    :aggregate-fields []})
         :validator (comp (partial = VERSION) :v)}))
    :component-did-mount
-   (fn [{:keys [state]}]
+   ;(fn [{:keys [state]}]
+   ;  (utils/cljslog (endpoints/get-library-attributes
+   ;    (fn [{:keys [success? get-parsed-response]}]
+   ;      (if success?
+   ;        (let [response (get-parsed-response)]
+   ;          (swap! state assoc
+   ;                 :library-attributes (:properties response)
+   ;                 :aggregate-fields (keep (fn [[k m]] (when (:aggregate m) {k m})) (:properties response)))))))))
+   (fn [{:keys [state props]}]
      (endpoints/get-library-attributes
-       (fn [{:keys [success? get-parsed-response]}]
-         (if success?
-           (let [response (get-parsed-response)]
-             (swap! state assoc
-                    :library-attributes (:properties response)
-                    :aggregate-fields (keep (fn [[k m]] (when (:aggregate m) {k m})) (:properties response))))))))
+                      (fn [{:keys [success? get-parsed-response]}]
+                        (if success?
+                          (let [response (get-parsed-response)]
+                            ;(utils/cljslog (:properties response))
+                            (swap! state assoc :library-attributes (:properties response))
+                            (let [new-attrs (keep (fn [[k m]]
+                                    ;(utils/cljslog k)
+                                    (when (:aggregate m) k)) (:properties response))]
+                              (utils/cljslog new-attrs)
+                              (endpoints/call-ajax-orch
+                 {:endpoint endpoints/search-datasets
+                  :payload {"fieldAggregations" new-attrs}
+                  :headers utils/content-type=json
+                  :on-done
+                  (fn [{:keys [success? get-parsed-response]}]
+                    (if success?
+                      (let [{:keys [aggregations]} (get-parsed-response)]
+                        (utils/cljslog "aggregations" aggregations)
+
+                     (swap! state assoc
+                            ;; order of facet checkboxes matter?
+                            ;:library-attributes (:properties response)
+                            :aggregate-fields aggregations))))})))))))
+
    :render
    (fn [{:keys [this state]}]
+     (if (not (empty? (utils/cljslog "empty?" (:aggregate-fields @state))))
+
      [:div {:style {:display "flex" :marginTop "2em"}}
       [:div {:style {:flex "0 0 250px" :marginRight "2em"}}
+
        [SearchSection {:search-text (:search-text @state)
                        :on-filter #(swap! state assoc :search-text %)}]
-       [FacetSection {:aggregate-fields (:aggregate-fields @state)
+       [FacetSection {:aggregate-fields (utils/cljslog "in page" (:aggregate-fields @state))
                       :facet-filters (:facet-filters @state)
                       :callback-function (fn [facet-name facet-list]
                                            (react/call :update-filter this facet-name facet-list))}]]
       [:div {:style {:flex "1 1 auto" :overflowX "auto"}}
-       [DatasetsTable {:search-text (:search-text @state)}]]])
+       [DatasetsTable {:ref "dataset-table"
+                       :aggregate-fields (:aggregate-fields @state)
+                       :aggregate-callback (fn [aggregate-data] (react/call :update-aggregates this aggregate-data))
+                       :search-text (:search-text @state)
+                       :facet-filters (:facet-filters @state)}]]]
+     [:div {} "Loading..."]))
    :component-did-update
    (fn [{:keys [state refs]}]
      (persistence/save {:key PERSISTENCE-KEY :state state})
-     (react/call :execute-search ( @refs "dataset-table")))})
+     ;(react/call :execute-search ( @refs "dataset-table"))
+     )})
