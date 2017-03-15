@@ -811,3 +811,13 @@
   {:path "/version/executionEngine"
    :method :get
    :mock-data {"cromwell" "25-489f66b"}})
+   
+(defn get-admin-stats [query-parameters]
+ (assert (= #{"startDate" "endDate"}
+            (set (keys query-parameters)))
+         (str "Malformed query parameters: " query-parameters))
+ {:path (str "/admin/statistics?"
+             (clojure.string/join "&" (keep (fn [[k v]]
+                                              (some->> v str not-empty (str k "=")))
+                                            query-parameters)))
+  :method :get})

@@ -6,6 +6,7 @@ exports.Bloodhound = require('corejs-typeahead');
 exports.CodeMirror = require('codemirror');
 exports.marked = require('marked');
 require('./js/timingDiagram');
+require('./js/adminStats');
 require('./js/igvPatch');
 require('any-resize-event');
 require('what-input');

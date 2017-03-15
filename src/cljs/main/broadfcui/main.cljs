@@ -10,6 +10,7 @@
    [broadfcui.endpoints :as endpoints]
    [broadfcui.nav :as nav]
    [broadfcui.nih-link-warning :as nih-link-warning]
+   [broadfcui.page.admin :as admin-page]
    [broadfcui.page.billing.billing-management :as billing-management]
    [broadfcui.page.library.library-page :as library-page]
    [broadfcui.page.method-repo.method-repo-page :as method-repo]
@@ -122,7 +123,10 @@
     :name "Method Repository"
     :render #(react/create-element method-repo/Page %)}
    {:key :policy
-    :render #(react/create-element Policy %)}])
+    :render #(react/create-element Policy %)}
+   {:key :stats :href "#stats"
+    :name "Stats"
+    :render #(react/create-element admin-page/Page %)}])
 
 (react/defc TopNavBarLink
   {:render
@@ -143,7 +147,7 @@
       [:div {:style {:display "inline-block" :paddingLeft "1em" :fontSize 18 :height 38 :verticalAlign "baseline"}}
        (map (fn [item] [TopNavBarLink {:name (:name item) :href (:href item)
                                        :selected (= (:selected-item props) (:key item))}])
-            (filter (comp #{:library :workspaces :methods} :key) routes))
+            (filter (comp #{:library :workspaces :methods :stats} :key) routes))
        (when (:show-nih-link-warning? props)
          [nih-link-warning/NihLinkWarning])]])})
 
