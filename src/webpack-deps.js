@@ -31,6 +31,7 @@ require('github-markdown-css/github-markdown.css');
 require('font-awesome/css/font-awesome.css');
 require('pipeline-builder/dist/pipeline.css');
 require('./styles/pipeline.scss');
+require('./styles/wdl-editor.scss');
 require('./styles/codemirror.scss');
 require('./styles/markdown.css');
 require('./styles/foundation.scss');

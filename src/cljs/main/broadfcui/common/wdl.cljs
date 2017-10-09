@@ -12,10 +12,11 @@
    (fn [{:keys [props]}]
      [:div {:style {:margin "2.5rem 1.5rem" :display "flex"}}
       [:div {:style {:flex "1 1 60%"}}
-       [PipelineBuilder{:WDL (:wdl props) :read-only? (:read-only? props)}]
+        [PipelineBuilder{:WDL (:wdl props) :read-only? (:read-only? props)}]
       ]
-      [:div {:style {:flex "1 1 40%" :minWidth "300px"}}
-       [WDLEditor {:WDL (:wdl props) :read-only? (:read-only? props)}]
+      [:div {:className "right-editor"
+             :style {:flex "1 1 40%" :minWidth "300px"}}
+        [WDLEditor {:WDL (:wdl props) :read-only? (:read-only? props)}]
       ]])
    :refresh
    (constantly nil)})
