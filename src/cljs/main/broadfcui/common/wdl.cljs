@@ -16,7 +16,7 @@
       ]
       [:div {:className "right-editor"
              :style {:flex "1 1 40%" :minWidth "300px"}}
-        [WDLEditor {:WDL (:wdl props) :read-only? (:read-only? props)}]
+        [WDLEditor {:WDL (:wdl props) :read-only? (:read-only? props) :onWDLChange (fn [newWDL]((:onWDLChange props) newWDL))}]
       ]])
    :refresh
    (constantly nil)})

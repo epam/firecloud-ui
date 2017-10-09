@@ -8,6 +8,8 @@
 
 (def ^:private diagram)
 
+(def ^:private WDL)
+
 (def ^:private workflow)
 
 (def ^:private portsAreActive false)
@@ -54,10 +56,20 @@
      [:div {:id "pipeline-builder" :style {:width "100%" :height "calc(100vh - 500px)" :overflow "hidden" :minHeight "300px"}}]])
    :component-did-mount
    (fn [{:keys [props this]}]
-     (def WDL (:WDL props))
+     (set! WDL (:WDL props))
      (set! diagram (Pipeline.Visualizer. (.getElementById js/document "pipeline-builder") true))
      (if (string/trim WDL)
        (let [parseResult (Pipeline.parse WDL)]
           (set! workflow (first parseResult.model))
           (.attachTo diagram workflow))
-       ))})
+       ))
+   :component-will-receive-props
+   (fn [{:keys [props next-props this]}]
+     (set! WDL (:WDL next-props))
+     (if (string/trim WDL)
+       (let [parseResult (Pipeline.parse WDL)]
+         (set! workflow (first parseResult.model))
+         (.attachTo diagram workflow))
+       )
+     )
+   })

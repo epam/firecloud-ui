@@ -99,7 +99,10 @@
              (condp = active-tab
                WDL (react/create-element
                     [WDLViewer
-                     {:ref WDL :wdl (:payload selected-snapshot) :read-only? true}])
+                     {:ref WDL :wdl (:payload selected-snapshot) :read-only? false
+                      :onWDLChange (fn [newWDL]
+                                     (swap! state update :selected-snapshot merge {:payload newWDL} )
+                                    )}])
                CONFIGS (react/create-element
                         [configs/Configs
                          (merge {:ref CONFIGS}
