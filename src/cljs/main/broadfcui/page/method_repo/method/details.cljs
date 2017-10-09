@@ -14,7 +14,7 @@
    [broadfcui.page.method-repo.method.configs :as configs]
    [broadfcui.page.method-repo.method.exporter :refer [MethodExporter]]
    [broadfcui.page.method-repo.method.summary :refer [Summary]]
-   [broadfcui.page.method-repo.method.wdl :refer [WDLViewer]]
+   [broadfcui.common.wdl :refer [WDLViewer]]
    [broadfcui.page.workspace.workspace-common :as ws-common]
    [broadfcui.utils :as utils]
    ))
@@ -99,7 +99,7 @@
              (condp = active-tab
                WDL (react/create-element
                     [WDLViewer
-                     {:ref WDL :wdl (:payload selected-snapshot)}])
+                     {:ref WDL :wdl (:payload selected-snapshot) :read-only? true}])
                CONFIGS (react/create-element
                         [configs/Configs
                          (merge {:ref CONFIGS}

@@ -26,6 +26,7 @@ require('jquery-ui/themes/base/core.css');
 require('jquery-ui/themes/base/theme.css');
 require('jquery-ui/themes/base/draggable.css');
 require('codemirror/lib/codemirror.css');
+require('codemirror/theme/icecoder.css');
 require('github-markdown-css/github-markdown.css');
 require('font-awesome/css/font-awesome.css');
 require('pipeline-builder/dist/pipeline.css');
