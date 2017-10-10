@@ -12,10 +12,8 @@
 
 (def ^:private workflow)
 
-(def ^:private portsAreActive false)
-
 (react/defc PipelineBuilder
-  {:get-initial-state (constantly {:click-count 0})
+  {:get-initial-state (fn [{:keys [props]}] {:ports-are-active false})
    :render
    (fn [{:keys [this state]}]
      [:div {:style {:height "100%" :margin "block" :overflow "hidden"}
@@ -46,11 +44,10 @@
        [:span {:className "fa fa-expand"
                :onClick (fn [e](.fitToPage diagram.zoom))}]]
       [:div {:className "editor-buttons" :title "toggle links"}
-       [:span {:className (if portsAreActive "icon-enabled fa fa-exchange" "icon-disabled fa fa-exchange")
+       [:span {:className (if (:ports-are-active @state) "icon-enabled fa fa-exchange" "icon-disabled fa fa-exchange")
                :onClick (fn [e]
-                          (set! portsAreActive (not portsAreActive))
-                          (swap! state update :stack assoc portsAreActive)
-                          (.togglePorts diagram true portsAreActive)
+                          (swap! state assoc :ports-are-active (not (:ports-are-active @state)))
+                          (.togglePorts diagram true (not (:ports-are-active @state)))
                           (._update diagram))}]]
       ]
      [:div {:id "pipeline-builder" :style {:width "100%" :height "calc(100vh - 500px)" :overflow "hidden" :minHeight "300px"}}]])

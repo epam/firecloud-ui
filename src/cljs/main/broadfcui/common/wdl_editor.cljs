@@ -11,8 +11,7 @@
      [:div {:className "wdl-editor"}
       [:div {:className "wdl-title noselect"}
        [WDLEditorButtons {:onWDLChange (:onWDLChange props)}]
-       ;[:div {}
-       ; "Errors"]
+       [WDLEditorErrorsPanel {:wasRunned true :errors #js []  :isBuilding false}]
        ]
       [:div {:className "textarea-wrapper"}
        [CodeMirror {:text (:WDL props) :read-only? (:read-only? props)}]]])
@@ -73,8 +72,28 @@ task haplotypeCaller {
                                                 )}]         ;todo click handler
       ])})
 
-
-(react/defc WDLEditorErrorsPanel                            ;todo
-  {:render
-   (fn [{:keys [props]}]
-     [:div {:className ""}])})
+(react/defc WDLEditorErrorsPanel
+   { :get-initial-state
+     (fn [{:keys [props]}]
+        {:is-show-error false})
+     :render
+    (fn [{:keys [this props state]}]
+      (let [{:keys [wasRunned errors isBuilding]} props]
+        [:div {}
+      [:div {:className "message-block"}
+       [:div {}
+        (if (and isBuilding (not wasRunned)) [:span {:className "build-ok"} "building..."])
+        (if (and (= errors.length 0) wasRunned)[:span {:className "build-ok"  :onClick (fn [e](swap! state assoc :is-show-error true))}
+         [:i {:className "fa fa-check" :aria-hidden 'true'}]  "done"])
+        (if (and (> errors.length 0) wasRunned)[:span {:className "build-error"  :onClick (fn [e](swap! state assoc :is-show-error true))}
+         [:i {:className "fa fa-exclamation-triangle" :aria-hidden 'true'}]  errors.length])
+       ]]
+       (if (:is-show-error @state) [:div {:className "error-trace" :id "error"}
+                       [:div {:className "error-trace-header"}
+                        [:span {:className "error-trace-header-name"} "ERRORS"
+                         [:span {:className "error-trace-header-count"} (str " ("errors.length ")")]]
+                        [:i {:className "fa fa-times" :onClick (fn [e](swap! state assoc :is-show-error false))}]]
+                       [:div {:className "error-trace-container"}
+                        (doseq [[key value] errors] [:div {:className "error-stacktrace"} value])]
+        ])]
+      ))})
