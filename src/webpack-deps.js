@@ -6,6 +6,7 @@ exports.CodeMirror = require('codemirror');
 require('codemirror/mode/clojure/clojure');
 exports.MarkdownIt = require('markdown-it');
 exports.Pipeline = require('pipeline-builder');
+exports.Downloadjs = require('downloadjs');
 require('./js/timingDiagram');
 require('./js/igvPatch');
 require('any-resize-event');

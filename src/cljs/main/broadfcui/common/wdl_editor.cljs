@@ -3,7 +3,10 @@
     [dmohs.react :as react]
     [broadfcui.common.codemirror :refer [CodeMirror]]
     [broadfcui.utils :as utils]
+    [clojure.string :as string]
     [broadfcui.common.pipeline :refer [PipelineBuilder]]))
+
+(def ^:private Downloadjs (aget js/window "webpack-deps" "Downloadjs"))
 
 (react/defc WDLEditor
   {:get-initial-state (fn [{:keys [props]}] {:currentWDLState (:WDL props)})
@@ -12,11 +15,11 @@
       (let [{:keys [currentWDLState]} @state]
         [:div {:className "wdl-editor"}
           [:div {:className "wdl-title noselect"}
-            [WDLEditorButtons {:onWDLBuildClick (fn [] ((:onWDLChange props) (:currentWDLState @state)))}]
+            [WDLEditorButtons {:WDL currentWDLState :onWDLBuildClick (fn [] ((:onWDLChange props) (:currentWDLState @state)))}]
             [WDLEditorErrorsPanel {:wasRunned (:wasRunned props) :errors (:errors props)  :isBuilding (:isBuilding props)}]
           ]
           [:div {:className "textarea-wrapper"}
-            [CodeMirror {:text       currentWDLState
+            [CodeMirror {:text currentWDLState
               :read-only? (:read-only? props)
               :initialize (fn [self]
                 (self :add-listener "change"
@@ -40,7 +43,8 @@
       [EditorButton {:icon-name "files-o" :button-text "Clipboard"
                      :onClickCallback (fn [e] ())}]         ;todo click handler
       [EditorButton {:icon-name "download" :button-text "Download"
-                     :onClickCallback (fn [e] ())}]         ;todo click handler
+                     :onClickCallback (fn [e] (let [currentDate (string/replace (subs (.toISOString (js/Date.)) 0 10) #"/-/g" "")]
+                                          (Downloadjs (js/Blob. #js [(:WDL props)]) (str "wdl-src" currentDate ".wdl") "text/plain")))}]
       [EditorButton {:icon-name "play" :button-text "Build"
                      :onClickCallback (fn [e] ((:onWDLBuildClick props)))}]
       ])})
