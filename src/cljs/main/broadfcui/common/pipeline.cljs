@@ -57,16 +57,21 @@
      (set! diagram (Pipeline.Visualizer. (.getElementById js/document "pipeline-builder") true))
      (if (string/trim WDL)
        (let [parseResult (Pipeline.parse WDL)]
-          (set! workflow (first parseResult.model))
-          (.attachTo diagram workflow))
-       ))
+         (if parseResult.status
+           (do
+             (set! workflow (first parseResult.model))
+             (.attachTo diagram workflow)))
+         (if (not (:isParsed props))
+           ((:onResultParseWDL props) (if parseResult.status #js [] #js [parseResult.message]) false true)))))
    :component-will-receive-props
    (fn [{:keys [props next-props this]}]
      (set! WDL (:WDL next-props))
      (if (string/trim WDL)
        (let [parseResult (Pipeline.parse WDL)]
-         (set! workflow (first parseResult.model))
-         (.attachTo diagram workflow))
-       )
-     )
+         (if parseResult.status
+           (do
+             (set! workflow (first parseResult.model))
+             (.attachTo diagram workflow)))
+         (if (not (:isParsed next-props))
+           ((:onResultParseWDL next-props) (if parseResult.status #js [] #js [parseResult.message]) false true)))))
    })

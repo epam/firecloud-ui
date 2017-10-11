@@ -13,7 +13,7 @@
         [:div {:className "wdl-editor"}
           [:div {:className "wdl-title noselect"}
             [WDLEditorButtons {:onWDLBuildClick (fn [] ((:onWDLChange props) (:currentWDLState @state)))}]
-            [WDLEditorErrorsPanel {:wasRunned true :errors #js []  :isBuilding false}]
+            [WDLEditorErrorsPanel {:wasRunned (:wasRunned props) :errors (:errors props)  :isBuilding (:isBuilding props)}]
           ]
           [:div {:className "textarea-wrapper"}
             [CodeMirror {:text       currentWDLState
@@ -22,7 +22,7 @@
                 (self :add-listener "change"
                       (fn [] (swap! state assoc :currentWDLState (js->clj (self :call-method "getValue"))))))
               }]]]))
-             :refresh
+    :refresh
     (constantly nil)})
 
 (react/defc- EditorButton
@@ -61,12 +61,14 @@
         (if (and (> errors.length 0) wasRunned)[:span {:className "build-error"  :onClick (fn [e](swap! state assoc :is-show-error true))}
          [:i {:className "fa fa-exclamation-triangle" :aria-hidden 'true'}]  errors.length])
        ]]
-       (if (:is-show-error @state) [:div {:className "error-trace" :id "error"}
+       (if (:is-show-error @state)
+         [:div {:className "error-trace" :id "error"}
                        [:div {:className "error-trace-header"}
                         [:span {:className "error-trace-header-name"} "ERRORS"
                          [:span {:className "error-trace-header-count"} (str " ("errors.length ")")]]
                         [:i {:className "fa fa-times" :onClick (fn [e](swap! state assoc :is-show-error false))}]]
                        [:div {:className "error-trace-container"}
-                        (doseq [[key value] errors] [:div {:className "error-stacktrace"} value])]
+                        [:div {} (for [error errors]
+                        [:div {:className "error-stacktrace"} error])]]
         ])]
       ))})
