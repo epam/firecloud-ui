@@ -7,6 +7,7 @@
    [org.clojure/clojure "1.8.0"]
    [org.clojure/clojurescript "1.9.293"]
    [cljsjs/react-autosuggest "9.3.2-0"]
+   [cljsjs/clipboard "1.6.1-1"]
    ]
   :plugins [[lein-cljsbuild "1.1.4"] [lein-figwheel "0.5.8"] [lein-resource "16.9.1"]]
   :profiles {:dev
