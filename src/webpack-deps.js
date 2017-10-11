@@ -38,3 +38,4 @@ require('./styles/markdown.css');
 require('./styles/foundation.scss');
 require('./styles/select2.scss');
 require('./styles/react-shims.scss');
+require('./styles/resizer.scss');

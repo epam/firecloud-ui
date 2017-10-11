@@ -3,6 +3,7 @@
    [dmohs.react :as react]
    [broadfcui.common.codemirror :refer [CodeMirror]]
    [broadfcui.common.wdl-editor :refer [WDLEditor]]
+   [broadfcui.common.resizer :refer [Resizer]]
    [broadfcui.utils :as utils]
    [broadfcui.common.pipeline :refer [PipelineBuilder]]
    ))
@@ -26,6 +27,9 @@
       ]
       [:div {:className "right-editor" :id "right-editor"
              :style {:flex "1 1 40%" :minWidth "450px" :position "relative"}}
+        [Resizer {:target "right-editor" :minTargetWidth 420 :flexAfter 320 :flex (fn [isHide](
+
+                                                             ))}]
         [WDLEditor {:WDL (:wdl props)
                     :errors (:errors @state)
                     :isBuilding (:isBuilding @state)

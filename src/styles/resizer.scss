@@ -1,0 +1,19 @@
+.pb-resizer {
+
+  padding: 0 7px;
+  position: absolute;
+  top: 10px;
+  left: -35px;
+  background-color: #424243;
+  font-size: 0;
+  cursor: w-resize;
+
+  .resizer-stick {
+    margin: 9px 3px;
+    width: 1px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: top;
+    background-color: #FFF;
+  }
+}
