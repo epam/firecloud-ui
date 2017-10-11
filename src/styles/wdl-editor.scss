@@ -95,6 +95,22 @@ $search_block_border_radius:  7px;
       }
     }
   }
+
+
+
+}
+
+.code-mirror {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(104, 103, 106, 1);
+  }
+
 }
 
 
@@ -174,10 +190,6 @@ $search_block_border_radius:  7px;
   padding: 15px 10px 25px 20px;
   display: flex;
   flex-grow: 1;
-
-  /* todo remove this when wdlEditor will replace old WDLViewer across all site &
-   * todo remove border from '.textarea-wrapper > div' (currently /src/cljs/main/broadfcui/common/codemirror.cljs:67) */
-  border: none !important;
 }
 
 .code-src {
