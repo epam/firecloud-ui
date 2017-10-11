@@ -16,7 +16,7 @@
                           :wasRunned false})
     :render (fn [{:keys [props state]}]
      [:div {:style {:margin "2.5rem 1.5rem" :display "flex"}}
-      [:div {:style {:flex "1 1 60%"}}
+      [:div {:style {:flex "1 1 60%" :minWidth "300px"}}
         [PipelineBuilder{:WDL (:wdl props)
                          :isParsed (:isParsed @state)
                          :read-only? (:read-only? props)
@@ -24,8 +24,8 @@
                           (swap! state merge{:errors newErrors :isParsed   true :isBuilding newIsBuilding :wasRunned  newWasRunned})
         )}]
       ]
-      [:div {:className "right-editor"
-             :style {:flex "1 1 40%" :minWidth "300px"}}
+      [:div {:className "right-editor" :id "right-editor"
+             :style {:flex "1 1 40%" :minWidth "450px" :position "relative"}}
         [WDLEditor {:WDL (:wdl props)
                     :errors (:errors @state)
                     :isBuilding (:isBuilding @state)
