@@ -30,7 +30,7 @@
       (this :-render-main)])
    :-render-sidebar
    (fn [{:keys [props state locals]}]
-     (let [{:keys [selected-snapshot]} props
+     (let [{:keys [selected-snapshot refresh-snapshot]} props
            {:keys [managers]} selected-snapshot
            owner? (contains? (set managers) (utils/get-user-email))
            {:keys [body-id]} @locals
@@ -46,6 +46,7 @@
           [mca/AgoraPermsEditor
            {:save-endpoint (endpoints/persist-agora-entity-acl false selected-snapshot)
             :load-endpoint (endpoints/get-agora-entity-acl false selected-snapshot)
+            :on-commit refresh-snapshot
             :entityType (:entityType selected-snapshot)
             :entityName (mca/get-ordered-name selected-snapshot)
             :title (str (:entityType selected-snapshot) " " (mca/get-ordered-name selected-snapshot))}]
@@ -84,11 +85,13 @@
                :onClick #(swap! state assoc :deleting? true)}])]}]]))
    :-render-main
    (fn [{:keys [props locals]}]
-     (let [{:keys [synopsis managers createDate documentation]} (:selected-snapshot props)
+     (let [{:keys [synopsis managers createDate documentation snapshotComment]} (:selected-snapshot props)
            {:keys [body-id]} @locals]
        [:div {:style {:flex "1 1 auto" :overflow "hidden" :paddingLeft icons/fw-icon-width}
               :id body-id}
-        (style/create-summary-block "Synopsis" synopsis)
+        [:div {:style {:display "flex"}}
+         (style/create-summary-block "Synopsis" synopsis)
+         (style/create-summary-block "Snapshot Comment" snapshotComment)]
         [:div {:style {:display "flex"}}
          (style/create-summary-block (str "Method Owner" (when (> (count managers) 1) "s"))
                                      (string/join ", " managers))
