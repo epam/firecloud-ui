@@ -17,7 +17,7 @@
                           :wasRunned false})
     :render (fn [{:keys [props state]}]
      [:div {:style {:position "relative" :width "100%"}}
-      [:div {:style {:width "100%" :minWidth "300px"}}
+      [:div {:style {:width "calc(100% - 450px)" :minWidth "300px"}}
         [PipelineBuilder{:WDL (:wdl props)
                          :isParsed (:isParsed @state)
                          :read-only? (:read-only? props)
