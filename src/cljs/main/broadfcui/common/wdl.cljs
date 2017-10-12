@@ -4,7 +4,6 @@
    [broadfcui.common.codemirror :refer [CodeMirror]]
    [broadfcui.common.wdl-editor :refer [WDLEditor]]
    [broadfcui.common.resizer :refer [Resizer]]
-   [broadfcui.utils :as utils]
    [broadfcui.common.pipeline :refer [PipelineBuilder]]
    ))
 

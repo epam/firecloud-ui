@@ -3,9 +3,7 @@
     [dmohs.react :as react]
     [cljsjs.clipboard]
     [broadfcui.common.codemirror :refer [CodeMirror]]
-    [broadfcui.utils :as utils]
-    [clojure.string :as string]
-    [broadfcui.common.pipeline :refer [PipelineBuilder]]))
+    [clojure.string :as string]))
 
 (def ^:private Downloadjs (aget js/window "webpack-deps" "Downloadjs"))
 
@@ -22,10 +20,9 @@
  {:render
   (fn [{:keys [props]}]
     [:span {}
-      [:textarea {:id "copy-to-clipboard-wdl-textarea" :value (:WDL props) :readOnly true
-                  :style {:position "fixed" :top "-999999px" :left "-999999px"}}]
-      [:button.clipboard {:id "copy-clipboard-button-id" :className "button-wdl" :data-clipboard-target "#copy-to-clipboard-wdl-textarea"}
-        [:i {:className "fa fa-files-o"}] [:span {:className "action-wdl"} (:label props)]]])
+     [:button.clipboard {:id "copy-clipboard-button-id" :className "button-wdl" :data-clipboard-text (:WDL props)}
+      [:i {:className "fa fa-files-o"}] [:span {:className "action-wdl"} (:label props)]]
+     ])
   :component-did-mount
     #(let [clipboard (js/Clipboard. "#copy-clipboard-button-id")]
        (reset! clipboard-atom clipboard))
