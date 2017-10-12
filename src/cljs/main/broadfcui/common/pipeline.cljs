@@ -50,7 +50,7 @@
                           (.togglePorts diagram true (not (:ports-are-active @state)))
                           (._update diagram))}]]
       ]
-     [:div {:id "pipeline-builder" :style {:width "100%" :height "calc(100vh - 500px)" :overflow "hidden" :minHeight "518px"}}]])
+     [:div {:id "pipeline-builder" :style {:width "100%" :height "calc(100vh - 500px)" :overflow "hidden" :minHeight "517px"}}]])
    :component-did-mount
    (fn [{:keys [props this]}]
      (set! WDL (:WDL props))

@@ -16,8 +16,12 @@
                           :isBuilding true
                           :wasRunned false})
     :render (fn [{:keys [props state]}]
-     [:div {:style {:margin "2.5rem 1.5rem" :display "flex"}}
-      [:div {:style {:flex "1 1 60%" :minWidth "300px"}}
+     [:div {:style {:margin "2.5rem 0"
+                    :position "relative"
+                    :width "100%"}}
+      [:div {:style {:width "100%"
+                     :margin-left "1.5rem"
+                     :minWidth "300px"}}
         [PipelineBuilder{:WDL (:wdl props)
                          :isParsed (:isParsed @state)
                          :read-only? (:read-only? props)
@@ -26,20 +30,22 @@
         )}]
       ]
       [:div {:className "right-editor" :id "right-editor"
-             :style {:flex "1 1 40%" :minWidth "450px" :position "relative"}}
-        [Resizer {:target "right-editor" :minTargetWidth 420 :flexAfter 320 :flex (fn [isHide](
-
-                                                             ))}]
-        [WDLEditor {:WDL (:wdl props)
+             :style {:position "absolute"
+                     :top "0"
+                     :right "0"
+                     :minWidth "450px"}}
+        [:div {:style {:position "relative"}}
+          [Resizer {:target "right-editor" :minTargetWidth 450 :flexAfter 320}]
+          [WDLEditor {:WDL (:wdl props)
                     :errors (:errors @state)
                     :isBuilding (:isBuilding @state)
                     :wasRunned (:wasRunned @state)
                     :read-only? (:read-only? props)
                     :onWDLChange (fn [newWDL]((swap! state assoc :isParsed false)
                                                ((:onWDLChange props) newWDL)
-                                              ))}]
-      ]])
+                                              ))}]]]])
    :refresh
    (constantly nil)
-   :component-did-mount (fn [{:keys [state]}]
-                           (swap! state merge{:isParsed false}))})
+   :component-did-mount
+   (fn [{:keys [state]}]
+       (swap! state merge{:isParsed false}))})

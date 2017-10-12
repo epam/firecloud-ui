@@ -22,9 +22,9 @@
  {:render
   (fn [{:keys [props]}]
     [:span {}
-      [:textarea {:id "copy-this" :value (:WDL props) :readOnly true
+      [:textarea {:id "copy-to-clipboard-wdl-textarea" :value (:WDL props) :readOnly true
                   :style {:position "fixed" :top "-999999px" :left "-999999px"}}]
-      [:button.clipboard {:id "copy-clipboard-button-id" :className "button-wdl" :data-clipboard-target (:target props)}
+      [:button.clipboard {:id "copy-clipboard-button-id" :className "button-wdl" :data-clipboard-target "#copy-to-clipboard-wdl-textarea"}
         [:i {:className "fa fa-files-o"}] [:span {:className "action-wdl"} (:label props)]]])
   :component-did-mount
     #(let [clipboard (js/Clipboard. "#copy-clipboard-button-id")]
@@ -38,7 +38,7 @@
   {:render
    (fn [{:keys [props]}]
      [:div {:className "title-right-block noselect"}
-      [ClipboardButton {:label "Clipboard" :target "#copy-this" :WDL (:WDL props)}]
+      [ClipboardButton {:label "Clipboard" :WDL (:WDL props)}]
       [EditorButton {:icon-name "download" :button-text "Download"
                      :onClickCallback (fn [e] (let [currentDate (string/replace (subs (.toISOString (js/Date.)) 0 10) #"/-/g" "")]
                                           (Downloadjs (js/Blob. #js [(:WDL props)]) (str "wdl-src" currentDate ".wdl") "text/plain")))}]
