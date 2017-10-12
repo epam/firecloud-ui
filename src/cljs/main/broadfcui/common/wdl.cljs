@@ -33,7 +33,8 @@
              :style {:position "absolute"
                      :top "0"
                      :right "0"
-                     :minWidth "450px"}}
+                     :minWidth "450px"
+                     :maxWidth "50vw"}}
         [:div {:style {:position "relative"}}
           [Resizer {:target "right-editor" :minTargetWidth 450 :flexAfter 320}]
           [WDLEditor {:WDL (:wdl props)
