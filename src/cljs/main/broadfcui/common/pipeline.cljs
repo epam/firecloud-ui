@@ -16,9 +16,9 @@
   {:get-initial-state (fn [{:keys [props]}] {:ports-are-active false})
    :render
    (fn [{:keys [this state]}]
-     [:div {:style {:height "100%" :margin "block" :overflow "hidden"}
+     [:div {:style {:height "100%" :margin "block" :overflow "hidden" :position "relative"}
             :display "block"}
-     [:div {:className "editor-buttons-wrapper"}
+     [:div {:className "editor-buttons-wrapper" :style {:position "absolute" :top "10px" :left "10px"}}
       [:div {:className "editor-buttons" :title "zoom in"}
        [:span {:className "fa fa-search-plus"
                :onClick (fn [e](.zoomIn diagram.zoom))}]]
@@ -50,7 +50,7 @@
                           (.togglePorts diagram true (not (:ports-are-active @state)))
                           (._update diagram))}]]
       ]
-     [:div {:id "pipeline-builder" :style {:width "100%" :height "calc(100vh - 500px)" :overflow "hidden" :minHeight "517px"}}]])
+     [:div {:id "pipeline-builder" :style {:width "100%" :height "calc(100vh - 500px)" :overflow "hidden" :minHeight "558px"}}]])
    :component-did-mount
    (fn [{:keys [props this]}]
      (set! WDL (:WDL props))

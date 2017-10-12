@@ -16,19 +16,13 @@
                           :isBuilding true
                           :wasRunned false})
     :render (fn [{:keys [props state]}]
-     [:div {:style {:margin "2.5rem 0"
-                    :position "relative"
-                    :width "100%"}}
-      [:div {:style {:width "100%"
-                     :margin-left "1.5rem"
-                     :minWidth "300px"}}
+     [:div {:style {:position "relative" :width "100%"}}
+      [:div {:style {:width "100%" :minWidth "300px"}}
         [PipelineBuilder{:WDL (:wdl props)
                          :isParsed (:isParsed @state)
                          :read-only? (:read-only? props)
                          :onResultParseWDL (fn [newErrors newIsBuilding newWasRunned]
-                          (swap! state merge{:errors newErrors :isParsed   true :isBuilding newIsBuilding :wasRunned  newWasRunned})
-        )}]
-      ]
+                          (swap! state merge{:errors newErrors :isParsed   true :isBuilding newIsBuilding :wasRunned  newWasRunned}))}]]
       [:div {:className "right-editor" :id "right-editor"
              :style {:position "absolute"
                      :top "0"

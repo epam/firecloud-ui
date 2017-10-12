@@ -88,7 +88,7 @@
                                     :context-id (assoc method-id :snapshot-id selected-snapshot-id)
                                     :active-tab (or active-tab SUMMARY)}
                                    (utils/restructure request-refresh refresh-tab)))
-        [:div {:style {:marginTop "2rem"}}
+        [:div {}
          (if method-error
            [:div {:style {:textAlign "center" :color (:exception-state style/colors)}
                   :data-test-id "method-details-error"}
